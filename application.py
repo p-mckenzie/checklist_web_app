@@ -23,6 +23,34 @@ app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
+# ---------- database configuration -----------------
+import sqlite3, os
+from flask import g
+
+def init_db():
+    with app.app_context():
+        db = get_db()
+        with app.open_resource('schema.sql', mode='r') as f:
+            db.cursor().executescript(f.read())
+        db.commit()
+
+def get_db():
+    db = getattr(g, '_database', None)
+    if db is None:
+        db = g._database = sqlite3.connect(DATABASE)
+    return db
+
+@app.teardown_appcontext
+def close_connection(exception):
+    db = getattr(g, '_database', None)
+    if db is not None:
+        db.close()
+		
+DATABASE = 'database.db'
+if not os.path.isfile(DATABASE):
+	# create database from schema if necessary
+	init_db()
+
 @app.route("/")
 def index():
 	'''homepage - simply renders existing db state
@@ -52,7 +80,16 @@ def register():
 			return redirect('/register')
 
 		# TO-DO: store username/hashed passwords in DB
-
+		try:
+			db = get_db()
+			cur = db.cursor()
+			cur.execute('''INSERT INTO users (username,hash) 
+			   VALUES (?,?)''',(request.form.get("username"), request.form.get("password")))
+			
+			db.commit()
+		except:
+			db.rollback()
+         
 		# Remember which user has logged in
 		#session["user_id"] = rows[0]["id"]
 
