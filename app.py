@@ -50,17 +50,47 @@ DATABASE = 'database.db'
 if not os.path.isfile(DATABASE):
     # create database from schema if necessary
     init_db()
+    
+def hash(str):
+    return ord(str[0])
 
 @app.route("/")
 def index():
     '''homepage - simply renders existing db state
     '''
-    db = get_db()
-    cur = db.cursor()
+    if 'user_id' in session:
+        db = get_db()
+        cur = db.cursor()
+        
+        rows = cur.execute('''select title from tasks where id = ?;''', [session['user_id']]).fetchall()
+        
+        return render_template('index.html', entries=[row[0].capitalize() for row in rows])
+    else:
+        return render_template('index.html')
     
-    rows = cur.execute('''select username from users;''').fetchall()
-    
-    return render_template('index.html', entries=[row[0] for row in rows])
+@app.route("/new", methods=["GET", "POST"])
+def new():
+    '''form to create a new task
+    '''
+    if request.method == "POST":
+            
+        # add data to database
+        db = get_db()
+        cur = db.cursor()
+                    
+        cur.execute('''INSERT INTO tasks (id,title,date,freq) 
+           VALUES (?,?,?,?)''', [session['user_id'], request.form.get("title"), request.form.get("date"),
+                        request.form.get("dropdown")])
+        
+        db.commit()
+        
+        return redirect('/')
+        
+    else: # get request
+        if 'user_id' in session:
+            return render_template('new.html')
+        else:
+            return redirect('/')
     
 @app.route("/register", methods=["GET", "POST"])
 def register():
@@ -83,32 +113,27 @@ def register():
             # to-do: produce error message of some kind
             return redirect('/register')
 
-        try:
-            db = get_db()
-            cur = db.cursor()
-            
-            rows = cur.execute('''select username from users where username = ?;''', 
-                            [request.form.get("username")]).fetchall()
-            if len(rows)>0:
-                # to-do: produce error message of some kind
-                return redirect('/register')
-                        
-            # to-do: actually secure hash
-            cur.execute('''INSERT INTO users (username,hash) 
-               VALUES (?,?)''', [request.form.get("username"), hash(request.form.get("password"))])
-            
-            db.commit()
-            
-            rows = cur.execute('''select username from users where username = ?;''', 
-                            [request.form.get("username")]).fetchall()
-            # Remember which user has logged in
-            session["user_id"] = rows[0]["id"]
-            return redirect('index')
-            
-        except:
-            db.rollback()
+        #try:
+        db = get_db()
+        cur = db.cursor()
+        
+        rows = cur.execute('''select username from users where username = ?;''', 
+                        [request.form.get("username")]).fetchall()
+        if len(rows)>0:
             # to-do: produce error message of some kind
             return redirect('/register')
+                    
+        # to-do: actually secure hash
+        cur.execute('''INSERT INTO users (username,hash) 
+           VALUES (?,?)''', [request.form.get("username"), hash(request.form.get("password"))])
+        
+        db.commit()
+        
+        rows = cur.execute('''select username,id from users where username = ?;''', 
+                        [request.form.get("username")]).fetchall()
+        # Remember which user has logged in
+        session["user_id"] = rows[0][1]
+        return redirect('/')
 
     # User reached route via GET (as by clicking a link or via redirect)
     else:
@@ -143,21 +168,18 @@ def login():
                             [request.form.get("username")]).fetchall()[0]
             
             # check password
-            print(row[0])
             # to-do: actually secure hash
             if row[0]!=hash(request.form.get("password")):
-                print("wrong password")
                 return redirect('/login')
             else:            
                 # Remember which user has logged in
                 session["user_id"] = row[1]
-        except:
-            print('whoop')
-            return redirect('/login')
                 
-        # Redirect user to home page
-        print('redirecting')
-        return redirect('index')
+            # Redirect user to home page
+            return redirect('/')
+                
+        except:
+            return redirect('/login')
 
     # User reached route via GET (as by clicking a link or via redirect)
     else:
