@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS 'tasks'
     'title' TEXT NOT NULL,
     'date' TEXT NOT NULL,
     'freq' INT NOT NULL DEFAULT 1,
+    'complete' INT NOT NULL DEFAULT 0,
     FOREIGN KEY(user_id) REFERENCES users(id));
 	
 INSERT INTO users (username,hash) values ('test',116);

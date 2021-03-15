@@ -10,7 +10,9 @@
 	
 	{% for rows in data %}
 		{% if rows|length > 0 %}
-			{% if loop.index==0 %}
+            <form action="/" method="POST">
+			
+            {% if loop.index==0 %}
 				<h4>Due today:</h4>
 			{% elif loop.index==1 %}
 				<h4>Due tomorrow:</h4>
@@ -19,9 +21,14 @@
 			{% endif %}
 				
 			{% for entry in rows %}
-				<input type="checkbox" id={{ loop.index }}>
-				<label for={{ loop.index }}> {{ entry.title }}</label><br>
+                {% if entry.complete==1 %}
+                    <input type="checkbox" id={{ entry.id }} name={{ entry.id }} onchange="this.form.submit()" checked>
+                {% else %}
+                    <input type="checkbox" id={{ entry.id }} name={{ entry.id }} onchange="this.form.submit()">
+                {% endif %}
+				<label for={{ entry.id }}> {{ entry.title }}</label><br>
 			{% endfor %}
+        </form>
         
 		{% else %}
 			<p>Wow, such empty</p>
