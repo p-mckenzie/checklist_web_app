@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS 'tasks'
 	
 INSERT INTO users (username,hash) values ('test',116);
 INSERT INTO tasks (user_id,title,date,freq) values 
+		(1,'Neg',date('now','-1 days'),1),
 		(1,'Foo',date('now','+1 days'),1),
 		(1,'Bar',date('now','+2 days'),1),
 		(1,'Baz',date('now','+3 days'),1),

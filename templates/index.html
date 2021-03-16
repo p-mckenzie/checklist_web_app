@@ -7,35 +7,41 @@
 {% block main %}
 	<h2>Outstanding tasks</h2>
 	<div align='left'>
+    <form action="/" method="POST">
 	
-	{% for rows in data %}
-		{% if rows|length > 0 %}
-            <form action="/" method="POST">
-			
-            {% if loop.index==0 %}
-				<h4>Due today:</h4>
-			{% elif loop.index==1 %}
-				<h4>Due tomorrow:</h4>
-			{% else %}
-				<h4>Upcoming:</h4>
-			{% endif %}
-				
-			{% for entry in rows %}
-                {% if entry.complete==1 %}
-                    <input type="checkbox" id={{ entry.id }} name={{ entry.id }} onchange="this.form.submit()" checked>
+    {% if data|length > 0 %}
+        {% for rows in data %}
+            {% if rows|length > 0 %}
+                
+                {% if loop.index==0 %}
+                    <h4>Due today:</h4>
+                {% elif loop.index==1 %}
+                    <h4>Due tomorrow:</h4>
                 {% else %}
-                    <input type="checkbox" id={{ entry.id }} name={{ entry.id }} onchange="this.form.submit()">
+                    <h4>Upcoming:</h4>
                 {% endif %}
-				<label for={{ entry.id }}> {{ entry.title }}</label><br>
-			{% endfor %}
-        </form>
-        
-		{% else %}
-			<p>Wow, such empty</p>
-		{% endif %}
-	{% endfor %}
-
+                    
+                {% for entry in rows %}
+                    {% if entry.complete==1 %}
+                        <input type="checkbox" id={{ entry.id }} name={{ entry.id }} onchange="this.form.submit()" checked>
+                    {% else %}
+                        <input type="checkbox" id={{ entry.id }} name={{ entry.id }} onchange="this.form.submit()">
+                    {% endif %}
+                    <label for={{ entry.id }}> {{ entry.title }}</label><br>
+                {% endfor %}
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+    
+    {% if finished|length > 0 %}
+        <h4>Complete:</h4>
+        {% for entry in finished %}
+            <input type="checkbox" id={{ entry.id }} name={{ entry.id }} onchange="this.form.submit()" checked>
+            <label for={{ entry.id }}> {{ entry.title }}</label><br>
+        {% endfor %}
+    {% endif %}
+    </form>
 	</div>
-    <br>
+    
 	
 {% endblock %}

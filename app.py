@@ -66,24 +66,34 @@ def index():
     db = get_db()
     cur = db.cursor()
     
-    if request.method == "POST":        
+    if request.method == "POST":     
         # update database to mark current task complete
-        cur.execute('''UPDATE tasks SET complete=1 WHERE id=?;''', [list(request.form)[0]])
-        db.commit()
+        if len(request.form)>0:
+            cur.execute('''UPDATE tasks SET complete= (CASE WHEN complete=0 then 1 else 0 end) where id=?;''', [list(request.form)[0]])
+            db.commit()
+        elif len(request.form)==0:
+            cur.execute('''UPDATE tasks SET complete=0 where user_id=?;''', [session['user_id']])
+            db.commit()
+            
     
     if 'user_id' in session:
         
         rows = [dict(row) for row in cur.execute('''select *, case when cast((julianday(date)-julianday('now')) as integer)>2 then 2 else cast((julianday(date)-julianday('now')) as integer) end as days_to_complete 
                                 from tasks 
-                                where user_id=? and date>=? 
+                                where user_id=? and date>=? and complete=0 
                                 order by date asc;''', 
+                                 
                     [session['user_id'], datetime.datetime.today().strftime('%Y-%m-%d')]).fetchall()]
         data = [[row for row in rows if row['days_to_complete']==0],
                 [row for row in rows if row['days_to_complete']==1],
                 [row for row in rows if row['days_to_complete']==2]]
-        #print(data)
+        finished = [dict(row) for row in cur.execute('''select *
+                                from tasks 
+                                where user_id=? and complete=1
+                                order by date asc;''', 
+                    [session['user_id']]).fetchall()]
         
-        return render_template('index.html', data=data)
+        return render_template('index.html', data=data, finished=finished)
     else:
         return render_template('index.html')
     
