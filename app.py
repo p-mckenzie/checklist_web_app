@@ -98,14 +98,39 @@ def index():
     else:
         return render_template('index.html')
         
-@app.route("/examine/<task_id>", methods=['GET'])
-def examine(task_id):
+@app.route("/edit/<task_id>", methods=['GET', 'POST'])
+def edit(task_id):
     '''form to create a new task
     '''
-    if 'user_id' in session:
-        return render_template('examine.html', title='Lolwhat', due_date='2021-02-22', repeat=3)
-    else:
+    if request.method == "POST":     
+        # update current task with new values
+        db = get_db()
+        cur = db.cursor()
+        
+        cur.execute('''UPDATE tasks 
+                        set title=?,
+                            date=?,
+                            freq=?
+                        where user_id=? and id=?;''', 
+                    [request.form.get("title"), request.form.get("date"), request.form.get("dropdown"), 
+                            session['user_id'], task_id])
+        db.commit()
         return redirect('/')
+    else:
+        if 'user_id' in session:
+            db = get_db()
+            cur = db.cursor()
+            
+            # make sure current task & user_id are valid
+            try:
+                row = dict(cur.execute('''select *
+                                from tasks
+                                where user_id=? and id=?;''', 
+                    [session['user_id'], task_id]).fetchall()[0])
+            except IndexError:
+                return redirect('/')
+                #2021-02-22'
+            return render_template('edit.html', task_id=task_id, title=row['title'], due_date=row['date'], repeat=row['freq'])
     
 @app.route("/new", methods=["GET", "POST"])
 def new():

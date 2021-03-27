@@ -32,7 +32,7 @@
                         <input type="checkbox" id={{ entry.id }} name={{ entry.id }} onchange="this.form.submit()">
                     {% endif %}
                     <label for={{ entry.id }}> {{ entry.title }}</label>
-                    <a class="examine" href="/examine/{{entry.id}}" title="Edit">✎</a>
+                    <a href="/edit/{{entry.id}}" title="Edit">✎</a>
                     <br>
                 {% endfor %}
             {% endif %}
