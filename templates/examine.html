@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Edit Task
+{% endblock %}
+
+{% block main %}
+    <form action="/examine" method="post">
+        <div class="form-group">
+            <input autocomplete="off" autofocus class="form-control" name="title" placeholder="Task title" type="text" value={{ title }}>
+        </div>
+        <div class="form-group">
+            <input class="form-control" name="date" placeholder="Due date" type="date" value={{ due_date }}>
+        </div>
+        <label>Repeat?</label>
+             <select class="form-control" name="dropdown" type="dropdown">
+               <option value = "0"{% if repeat==0 %} selected="selected"{% endif %}>Never</option>
+               <option value = "1"{% if repeat==1 %} selected="selected"{% endif %}>Daily</option>
+               <option value = "2"{% if repeat==2 %} selected="selected"{% endif %}>Weekly</option>
+               <option value = "3"{% if repeat==3 %} selected="selected"{% endif %}>Monthly</option>
+               <option value = "4"{% if repeat==4 %} selected="selected"{% endif %}>Yearly</option>
+             </select>
+        <button class="btn btn-primary" type="submit">Submit</button>
+    </form>
+{% endblock %}

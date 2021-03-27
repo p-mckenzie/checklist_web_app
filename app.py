@@ -78,15 +78,16 @@ def index():
     
     if 'user_id' in session:
         
-        rows = [dict(row) for row in cur.execute('''select *, case when cast((julianday(date)-julianday('now')) as integer)>2 then 2 else cast((julianday(date)-julianday('now')) as integer) end as days_to_complete 
-                                from tasks 
-                                where user_id=? and date>=? and complete=0 
+        rows = [dict(row) for row in cur.execute('''select *, (julianday(date)-julianday('now')+1) as days_to_complete 
+                                from tasks
+                                where user_id=? and complete=0 
                                 order by date asc;''', 
-                                 
-                    [session['user_id'], datetime.datetime.today().strftime('%Y-%m-%d')]).fetchall()]
-        data = [[row for row in rows if row['days_to_complete']==0],
-                [row for row in rows if row['days_to_complete']==1],
-                [row for row in rows if row['days_to_complete']==2]]
+                    [session['user_id']]).fetchall()]
+        data = [[row for row in rows if row['days_to_complete']<0],
+                [row for row in rows if row['days_to_complete']>=0 and row['days_to_complete']<1],
+                [row for row in rows if row['days_to_complete']>=1 and row['days_to_complete']<2],
+                [row for row in rows if row['days_to_complete']>=2 and row['days_to_complete']<6],
+                [row for row in rows if row['days_to_complete']>=7]]
         finished = [dict(row) for row in cur.execute('''select *
                                 from tasks 
                                 where user_id=? and complete=1
@@ -96,6 +97,15 @@ def index():
         return render_template('index.html', data=data, finished=finished)
     else:
         return render_template('index.html')
+        
+@app.route("/examine/<task_id>", methods=['GET'])
+def examine(task_id):
+    '''form to create a new task
+    '''
+    if 'user_id' in session:
+        return render_template('examine.html', title='Lolwhat', due_date='2021-02-22', repeat=3)
+    else:
+        return redirect('/')
     
 @app.route("/new", methods=["GET", "POST"])
 def new():

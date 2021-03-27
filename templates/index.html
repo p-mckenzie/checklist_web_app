@@ -13,10 +13,14 @@
         {% for rows in data %}
             {% if rows|length > 0 %}
                 
-                {% if loop.index==0 %}
+                {% if loop.index==1 %}
+                    <h4>Overdue:</h4>
+                {% elif loop.index==2 %}
                     <h4>Due today:</h4>
-                {% elif loop.index==1 %}
+                {% elif loop.index==3 %}
                     <h4>Due tomorrow:</h4>
+                {% elif loop.index==4 %}
+                    <h4>Due later this week:</h4>
                 {% else %}
                     <h4>Upcoming:</h4>
                 {% endif %}
@@ -27,7 +31,9 @@
                     {% else %}
                         <input type="checkbox" id={{ entry.id }} name={{ entry.id }} onchange="this.form.submit()">
                     {% endif %}
-                    <label for={{ entry.id }}> {{ entry.title }}</label><br>
+                    <label for={{ entry.id }}> {{ entry.title }}</label>
+                    <a class="examine" href="/examine/{{entry.id}}" title="Edit">✎</a>
+                    <br>
                 {% endfor %}
             {% endif %}
         {% endfor %}
