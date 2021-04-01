@@ -14,17 +14,22 @@
             {% if rows|length > 0 %}
                 
                 {% if loop.index==1 %}
-                    <h4>Overdue:</h4>
+                <details>
+                    <summary>Overdue:</summary>
                 {% elif loop.index==2 %}
-                    <h4>Due today:</h4>
+                <details open>
+                    <summary>Today:</summary>
                 {% elif loop.index==3 %}
-                    <h4>Due tomorrow:</h4>
+                <details>
+                    <summary>Tomorrow:</summary>
                 {% elif loop.index==4 %}
-                    <h4>Due later this week:</h4>
+                <details>
+                    <summary>Later this week:</summary>
                 {% else %}
-                    <h4>Upcoming:</h4>
+                <details>
+                    <summary>Upcoming:</summary>
                 {% endif %}
-                    
+                <div class="offset">
                 {% for entry in rows %}
                     {% if entry.complete==1 %}
                         <input type="checkbox" id={{ entry.id }} name={{ entry.id }} onchange="this.form.submit()" checked>
@@ -35,16 +40,20 @@
                     <a href="/edit/{{entry.id}}" title="Edit">✎</a>
                     <br>
                 {% endfor %}
+                </div>
+                </details>
             {% endif %}
         {% endfor %}
     {% endif %}
     
     {% if finished|length > 0 %}
-        <h4>Complete:</h4>
+        <details>
+        <summary>Complete:</summary>
         {% for entry in finished %}
             <input type="checkbox" id={{ entry.id }} name={{ entry.id }} onchange="this.form.submit()" checked>
             <label for={{ entry.id }}> {{ entry.title }}</label><br>
         {% endfor %}
+        </details>
     {% endif %}
     </form>
 	</div>

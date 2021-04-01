@@ -1,5 +1,4 @@
-main .form-control
-{
+main .form-control {
     /* center form controls */
     display: inline-block;
 
@@ -7,8 +6,7 @@ main .form-control
     width: auto;
 }
 
-main
-{
+main {
     /* scroll horizontally as needed */
     overflow-x: auto;
 
@@ -16,8 +14,17 @@ main
     text-align: center;
 }
 
-main img
-{
+main img {
     /* constrain images on small screens */
     max-width: 100%;
+}
+
+.offset {
+    margin-left:1em;
+}
+
+summary {
+    margin-top: 1em;
+    margin-bottom: 1em;
+    font-size: 1.1em;
 }
