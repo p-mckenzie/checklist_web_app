@@ -49,16 +49,17 @@ def close_connection(exception):
         db.close()
         
 DATABASE = 'database.db'
-if not os.path.isfile(DATABASE):
+#if not os.path.isfile(DATABASE):
     # create database from schema if necessary
-    init_db()
+os.remove(DATABASE)
+init_db() # for testing - always reset database
     
 def hash(str):
     return ord(str[0])
 
 @app.route("/", methods=['GET', 'POST'])
 def index():
-    '''homepage - simply renders existing db state
+    '''homepage - renders existing tasks for user & allows them to mark them as complete
     '''
     
     # for testing - avoids having to log in as "test" user each time
@@ -69,14 +70,34 @@ def index():
     if request.method == "POST":     
         # update database to mark current task complete
         if len(request.form)>0:
-            cur.execute('''UPDATE tasks SET complete= (CASE WHEN complete=0 then 1 else 0 end) where id=?;''', [list(request.form)[0]])
+            # current task complete
+            cur.execute('''UPDATE tasks SET complete=(CASE WHEN complete=0 then 1 else 0 end) where id=?;''', [list(request.form)[0]])
             db.commit()
+            
+            try:
+                # if it repeats, create next instance
+                row = dict(cur.execute('''select *, case when freq=1 then date(date,'+1 days') 
+                                                        when freq=2 then date(date,'+7 days') 
+                                                        when freq=3 then date(date,'+1 months') 
+                                                        when freq=4 then date(date,'+1 years') 
+                                                        end as next_date 
+                                    from tasks
+                                    where id=? and freq>0;''', 
+                        [list(request.form)[0]]).fetchall()[0])
+                
+                cur.execute('''INSERT INTO tasks (user_id,title,date,freq) values (?,?,?,?);''',
+                        [row['user_id'], row['title'], row['next_date'], row['freq']])
+                db.commit()
+            except IndexError:
+                pass
+            
         elif len(request.form)==0:
             cur.execute('''UPDATE tasks SET complete=0 where user_id=?;''', [session['user_id']])
             db.commit()
             
-    
-    if 'user_id' in session:
+        return redirect('/')
+            
+    elif 'user_id' in session:
         
         rows = [dict(row) for row in cur.execute('''select *, (julianday(date)-julianday('now')+1) as days_to_complete 
                                 from tasks
@@ -88,13 +109,15 @@ def index():
                 [row for row in rows if row['days_to_complete']>=1 and row['days_to_complete']<2],
                 [row for row in rows if row['days_to_complete']>=2 and row['days_to_complete']<6],
                 [row for row in rows if row['days_to_complete']>=7]]
-        finished = [dict(row) for row in cur.execute('''select *
-                                from tasks 
-                                where user_id=? and complete=1
-                                order by date asc;''', 
-                    [session['user_id']]).fetchall()]
         
-        return render_template('index.html', data=data, finished=finished)
+        # removed for now - ability to restore completed tasks
+        #finished = [dict(row) for row in cur.execute('''select *
+        #                        from tasks 
+        #                        where user_id=? and complete=1
+        #                        order by date asc;''', 
+        #            [session['user_id']]).fetchall()]
+        
+        return render_template('index.html', data=data)#, finished=finished)
     else:
         return render_template('index.html')
         
