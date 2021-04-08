@@ -6,6 +6,7 @@ A python-based web application leveraging [Flask](https://flask.palletsprojects.
 ### User-facing functionality
 * Allows users to register for an account (username and password)
 * Allows registered users to log in
+* Allows users to log out
 * Allows users to create (optionally recurring) tasks with due dates
 * Displays outstanding tasks, arranged by due date
 * Allows users to edit outstanding tasks
@@ -13,6 +14,6 @@ A python-based web application leveraging [Flask](https://flask.palletsprojects.
 * Displays completed tasks' next recurrence on their next due date
 #### In-progress:
 * Allows users to delete tasks
-* Allows users to log out
+* Prompts users to log in instead of registering from /register
 
 Project start: 2/18/2021

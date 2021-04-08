@@ -53,7 +53,7 @@ DATABASE = 'database.db'
     # create database from schema if necessary
 os.remove(DATABASE)
 init_db() # for testing - always reset database
-    
+
 def hash(str):
     return ord(str[0])
 
@@ -62,8 +62,6 @@ def index():
     '''homepage - renders existing tasks for user & allows them to mark them as complete
     '''
     
-    # for testing - avoids having to log in as "test" user each time
-    session['user_id'] = 1
     db = get_db()
     cur = db.cursor()
     
@@ -119,7 +117,7 @@ def index():
         
         return render_template('index.html', data=data)#, finished=finished)
     else:
-        return render_template('index.html')
+        return render_template('register.html')
         
 @app.route("/edit/<task_id>", methods=['GET', 'POST'])
 def edit(task_id):
@@ -271,3 +269,12 @@ def login():
     # User reached route via GET (as by clicking a link or via redirect)
     else:
         return render_template("login.html")
+        
+@app.route("/logout", methods=['GET'])
+def logout():
+    '''Clears user session
+    '''
+    
+    # Forget any user_id
+    session.clear()
+    return redirect('/')
