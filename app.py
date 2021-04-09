@@ -117,46 +117,60 @@ def index():
         
         return render_template('index.html', data=data)#, finished=finished)
     else:
-        return render_template('register.html')
+        return render_template('login.html')
         
-@app.route("/edit/<task_id>", methods=['GET', 'POST'])
+@app.route("/edit/<task_id>", methods=['GET', 'POST', 'DELETE'])
 def edit(task_id):
     '''form to create a new task
     '''
-    if request.method == "POST":     
-        # update current task with new values
-        db = get_db()
-        cur = db.cursor()
-        
-        cur.execute('''UPDATE tasks 
-                        set title=?,
-                            date=?,
-                            freq=?
-                        where user_id=? and id=?;''', 
-                    [request.form.get("title"), request.form.get("date"), request.form.get("dropdown"), 
-                            session['user_id'], task_id])
-        db.commit()
+    if 'user_id' not in session:
         return redirect('/')
-    else:
-        if 'user_id' in session:
+        
+    if request.method == "POST":     
+        if 'delete' in request.form:
+            # remove the task from the DB
             db = get_db()
             cur = db.cursor()
             
-            # make sure current task & user_id are valid
-            try:
-                row = dict(cur.execute('''select *
-                                from tasks
-                                where user_id=? and id=?;''', 
-                    [session['user_id'], task_id]).fetchall()[0])
-            except IndexError:
-                return redirect('/')
-                #2021-02-22'
-            return render_template('edit.html', task_id=task_id, title=row['title'], due_date=row['date'], repeat=row['freq'])
+            cur.execute('''DELETE from tasks where user_id = ? and id=?;''', 
+                        [session['user_id'], task_id])
+            db.commit()
+            return redirect('/')
+        else:
+            # update current task with new values
+            db = get_db()
+            cur = db.cursor()
+            
+            cur.execute('''UPDATE tasks 
+                            set title=?,
+                                date=?,
+                                freq=?
+                            where user_id=? and id=?;''', 
+                        [request.form.get("title"), request.form.get("date"), request.form.get("dropdown"), 
+                                session['user_id'], task_id])
+            db.commit()
+            return redirect('/')
+        
+    else:
+        db = get_db()
+        cur = db.cursor()
+        
+        # make sure current task & user_id are valid
+        try:
+            row = dict(cur.execute('''select *
+                            from tasks
+                            where user_id=? and id=?;''', 
+                [session['user_id'], task_id]).fetchall()[0])
+        except IndexError:
+            return redirect('/')
+            
+        return render_template('edit.html', task_id=task_id, title=row['title'], due_date=row['date'], repeat=row['freq'])
     
 @app.route("/new", methods=["GET", "POST"])
 def new():
     '''form to create a new task
     '''
+        
     if request.method == "POST":
             
         # add data to database

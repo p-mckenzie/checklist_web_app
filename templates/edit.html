@@ -20,6 +20,12 @@
                <option value = "3"{% if repeat==3 %} selected="selected"{% endif %}>Monthly</option>
                <option value = "4"{% if repeat==4 %} selected="selected"{% endif %}>Yearly</option>
              </select>
-        <button class="btn btn-primary" type="submit">Submit</button>
+        
+        <div>
+            <button class="btn btn-primary" type="submit">Update task</button>
+        </div>
+        <div>
+            <button class="btn btn-delete" name="delete" type="submit">Delete task</button>
+        </div>
     </form>
 {% endblock %}

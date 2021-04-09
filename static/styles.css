@@ -28,3 +28,11 @@ summary {
     margin-bottom: 1em;
     font-size: 1.1em;
 }
+.btn {
+    margin-top:1em;
+    color:white;
+}
+.btn-delete {
+    background-color:#ab0f0f;
+    font-size:14px;
+}
