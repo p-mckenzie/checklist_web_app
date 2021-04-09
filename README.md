@@ -13,9 +13,10 @@ A python-based web application leveraging [Flask](https://flask.palletsprojects.
 * Allows users to mark outstanding tasks as complete
 * Displays completed tasks' next recurrence on their next due date
 * Allows users to delete tasks
+* Prompts users to log in instead of registering from /register
+* Prompts users to register instead of logging in from /login
 
 #### In-progress:
-* Prompts users to log in instead of registering from /register
 * Allows users to change their password
 * Allows users to delete their account
 

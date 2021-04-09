@@ -170,14 +170,13 @@ def edit(task_id):
 def new():
     '''form to create a new task
     '''
-        
     if request.method == "POST":
             
         # add data to database
         db = get_db()
         cur = db.cursor()
                     
-        cur.execute('''INSERT INTO tasks (id,title,date,freq) 
+        cur.execute('''INSERT INTO tasks (user_id,title,date,freq) 
            VALUES (?,?,?,?)''', [session['user_id'], request.form.get("title"), request.form.get("date"),
                         request.form.get("dropdown")])
         
@@ -208,7 +207,7 @@ def register():
             return redirect('/register')
 
         # Ensure password was submitted
-        elif not request.form.get("password"):
+        elif not request.form.get("password") or not request.form.get("password2"):
             # to-do: produce error message of some kind
             return redirect('/register')
 
