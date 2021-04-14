@@ -15,9 +15,12 @@ A python-based web application leveraging [Flask](https://flask.palletsprojects.
 * Allows users to delete tasks
 * Prompts users to log in instead of registering from /register
 * Prompts users to register instead of logging in from /login
-
-#### In-progress:
 * Allows users to change their password
 * Allows users to delete their account
+
+#### In-progress:
+* Produce errors when users enter insufficient data
+* Ask for confirmation when deleting tasks
+* Ask for confirmation when deleting account
 
 Project start: 2/18/2021
