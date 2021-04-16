@@ -1,7 +1,6 @@
-# To-Do Checklist Web App
+# Web App: To-Do Checklist
 
 A python-based web application leveraging [Flask](https://flask.palletsprojects.com/en/1.1.x/). 
-Completed 4/16/2021.
 
 ### User-facing functionality
 * Allows users to register for an account (username and password)
@@ -24,4 +23,5 @@ Completed 4/16/2021.
 
 
 Project start: 2/18/2021
+
 Project completion: 4/16/2021
