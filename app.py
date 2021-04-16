@@ -1,4 +1,4 @@
-from flask import Flask, flash, jsonify, redirect, render_template, request, session, url_for
+from flask import Flask, flash, jsonify, redirect, render_template, request, session, url_for, get_flashed_messages
 from flask_session import Session
 
 from tempfile import mkdtemp
@@ -34,6 +34,13 @@ def init_db():
         with app.open_resource('schema.sql', mode='r') as f:
             db.cursor().executescript(f.read())
         db.commit()
+        
+def stage_sample_data():
+    with app.app_context():
+        db = get_db()
+        with app.open_resource('sampledata.sql', mode='r') as f:
+            db.cursor().executescript(f.read())
+        db.commit()
 
 def get_db():
     db = getattr(g, '_database', None)
@@ -49,10 +56,12 @@ def close_connection(exception):
         db.close()
         
 DATABASE = 'database.db'
-#if not os.path.isfile(DATABASE):
+if not os.path.isfile(DATABASE):
     # create database from schema if necessary
-os.remove(DATABASE)
-init_db() # for testing - always reset database
+    init_db() 
+    
+# reset sample data every time
+stage_sample_data()
 
 def hash(str):
     return ord(str[0])
@@ -61,7 +70,7 @@ def hash(str):
 def index():
     '''homepage - renders existing tasks for user & allows them to mark them as complete
     '''
-    
+    get_flashed_messages()
     db = get_db()
     cur = db.cursor()
     
@@ -114,7 +123,6 @@ def index():
         #                        where user_id=? and complete=1
         #                        order by date asc;''', 
         #            [session['user_id']]).fetchall()]
-        
         return render_template('index.html', data=data)#, finished=finished)
     else:
         return render_template('login.html')
@@ -194,6 +202,7 @@ def new():
 def register():
     '''Allows user to register for an account
     '''
+    get_flashed_messages()
     
     # Forget any user_id
     session.clear()
@@ -201,24 +210,13 @@ def register():
     # User submitted form
     if request.method == "POST":
 
-        # Ensure username was submitted
-        if not request.form.get("username"):
-            # to-do: produce error message of some kind
-            return redirect('/register')
-
-        # Ensure password was submitted
-        elif not request.form.get("password") or not request.form.get("password2"):
-            # to-do: produce error message of some kind
-            return redirect('/register')
-
-        #try:
         db = get_db()
         cur = db.cursor()
         
         rows = cur.execute('''select username from users where username = ?;''', 
                         [request.form.get("username")]).fetchall()
         if len(rows)>0:
-            # to-do: produce error message of some kind
+            flash('ERROR: invalid username')
             return redirect('/register')
                     
         # to-do: actually secure hash
@@ -241,22 +239,13 @@ def register():
 def login():
     '''Allows user to register for an account
     '''
+    get_flashed_messages()
     
     # Forget any user_id
     session.clear()
 
     # User submitted form
     if request.method == "POST":
-
-        # Ensure username was submitted
-        if not request.form.get("username"):
-            # to-do: produce error message of some kind
-            return redirect('/login')
-
-        # Ensure password was submitted
-        elif not request.form.get("password"):
-            # to-do: produce error message of some kind
-            return redirect('/login')
 
         try:
             db = get_db()
@@ -267,6 +256,7 @@ def login():
             # check password
             # to-do: actually secure hash
             if row[0]!=hash(request.form.get("password")):
+                flash('ERROR: invalid username/password combination')
                 return redirect('/login')
             else:            
                 # Remember which user has logged in
@@ -292,9 +282,6 @@ def account():
     
         try:
             if 'delete' in request.form:
-                if not request.form.get("current"):
-                    # to-do: produce error message of some kind
-                    return redirect('/account')
                     
                 # remove the user and all related tasks from the DB
                 db = get_db()
@@ -306,6 +293,7 @@ def account():
                 # check password
                 # to-do: actually secure hash
                 if result['hash']!=hash(request.form.get("current")):
+                    flash('ERROR: invalid password')
                     return redirect('/account')
                 else:          
                     cur.execute('''DELETE from tasks where user_id = ?;''', 
@@ -318,11 +306,8 @@ def account():
             else: 
         
                 # Ensure username was submitted
-                if not request.form.get("current") or not request.form.get("new") or not request.form.get("new2"):
-                    # to-do: produce error message of some kind
-                    return redirect('/account')
-                    
-                elif request.form.get("new")!=request.form.get("new2"):
+                if request.form.get("new")!=request.form.get("new2"):
+                    flash('ERROR: new password & confirmation must match')
                     return redirect('/account')
 
                 db = get_db()

@@ -20,6 +20,7 @@ Completed 4/16/2021.
 * Produce errors when users enter insufficient data
 * Ask for confirmation when deleting tasks
 * Ask for confirmation when deleting account
+* Pop-up errors when data is incorrect
 
 
 Project start: 2/18/2021

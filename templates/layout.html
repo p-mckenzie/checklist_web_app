@@ -48,6 +48,17 @@
                 {% endif %}
             </div>
         </nav>
+        
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class=flashes>
+                {% for message in messages %}
+                    <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+                    {{ message }}
+                {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
 		
 		<!-- include actual content-->
         <main class="container p-5">
