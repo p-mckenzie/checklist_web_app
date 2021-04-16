@@ -5,27 +5,29 @@
 {% endblock %}
 
 {% block main %}
-    <form action="/edit/{{task_id}}" method="post">
-        <div class="form-group">
-            <input autocomplete="off" autofocus class="form-control" name="title" placeholder="Task title" type="text" value={{ title }}>
-        </div>
-        <div class="form-group">
-            <input class="form-control" name="date" placeholder="Due date" type="date" value={{ due_date }}>
-        </div>
-        <label>Repeat?</label>
-             <select class="form-control" name="dropdown" type="dropdown">
-               <option value = "0"{% if repeat==0 %} selected="selected"{% endif %}>Never</option>
-               <option value = "1"{% if repeat==1 %} selected="selected"{% endif %}>Daily</option>
-               <option value = "2"{% if repeat==2 %} selected="selected"{% endif %}>Weekly</option>
-               <option value = "3"{% if repeat==3 %} selected="selected"{% endif %}>Monthly</option>
-               <option value = "4"{% if repeat==4 %} selected="selected"{% endif %}>Yearly</option>
-             </select>
-        
-        <div>
-            <button class="btn btn-primary" type="submit">Update task</button>
-        </div>
-        <div>
-            <button class="btn btn-delete" name="delete" type="submit">Delete task</button>
-        </div>
-    </form>
+<h4>Edit Task</h4>
+
+<form action="/edit/{{task_id}}" method="post">
+    <div class="form-group">
+        <input autocomplete="off" autofocus class="form-control" name="title" placeholder="Task title" type="text" value={{ title }} required>
+    </div>
+    <div class="form-group">
+        <input class="form-control" name="date" placeholder="Due date" type="date" value={{ due_date }} required>
+    </div>
+    <label>Repeat?</label>
+         <select class="form-control" name="dropdown" type="dropdown">
+           <option value = "0"{% if repeat==0 %} selected="selected"{% endif %}>Never</option>
+           <option value = "1"{% if repeat==1 %} selected="selected"{% endif %}>Daily</option>
+           <option value = "2"{% if repeat==2 %} selected="selected"{% endif %}>Weekly</option>
+           <option value = "3"{% if repeat==3 %} selected="selected"{% endif %}>Monthly</option>
+           <option value = "4"{% if repeat==4 %} selected="selected"{% endif %}>Yearly</option>
+         </select>
+    
+    <div>
+        <button class="btn btn-primary" type="submit">Update task</button>
+    </div>
+    <div>
+        <button class="btn btn-delete" name="delete" type="submit" onClick="return confirm('Are you sure you wish to delete this task? Future recurrences will also be deleted.');">Delete task</button>
+    </div>
+</form>
 {% endblock %}

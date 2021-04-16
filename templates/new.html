@@ -5,21 +5,23 @@
 {% endblock %}
 
 {% block main %}
-    <form action="/new" method="post">
-        <div class="form-group">
-            <input autocomplete="off" autofocus class="form-control" name="title" placeholder="Task title" type="text">
-        </div>
-        <div class="form-group">
-            <input class="form-control" name="date" placeholder="Due date" type="date">
-        </div>
-        <label>Repeat?</label>
-             <select class="form-control" name="dropdown" type="dropdown">
-               <option value = "0">Never</option>
-               <option value = "1">Daily</option>
-               <option value = "2">Weekly</option>
-               <option value = "3">Monthly</option>
-               <option value = "4">Yearly</option>
-             </select>
-        <button class="btn btn-primary" type="submit">Submit</button>
-    </form>
+<h4>Create Task</h4>
+
+<form action="/new" method="post">
+    <div class="form-group">
+        <input autocomplete="off" autofocus class="form-control" name="title" placeholder="Task title" type="text" required>
+    </div>
+    <div class="form-group">
+        <input class="form-control" name="date" placeholder="Due date" type="date" required>
+    </div>
+    <label>Repeat?</label>
+         <select class="form-control" name="dropdown" type="dropdown">
+           <option value = "0">Never</option>
+           <option value = "1">Daily</option>
+           <option value = "2">Weekly</option>
+           <option value = "3">Monthly</option>
+           <option value = "4">Yearly</option>
+         </select>
+    <button class="btn btn-primary" type="submit">Submit</button>
+</form>
 {% endblock %}

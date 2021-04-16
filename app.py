@@ -119,7 +119,7 @@ def index():
     else:
         return render_template('login.html')
         
-@app.route("/edit/<task_id>", methods=['GET', 'POST', 'DELETE'])
+@app.route("/edit/<task_id>", methods=['GET', 'POST'])
 def edit(task_id):
     '''form to create a new task
     '''
@@ -292,34 +292,37 @@ def account():
     
         try:
             if 'delete' in request.form:
+                if not request.form.get("current"):
+                    # to-do: produce error message of some kind
+                    return redirect('/account')
+                    
                 # remove the user and all related tasks from the DB
                 db = get_db()
                 cur = db.cursor()
                 
-                cur.execute('''DELETE from tasks where user_id = ?;''', 
-                            [session['user_id']])
-                cur.execute('''DELETE from users where id = ?;''', [session['user_id']])
-                db.commit()
-                
-                del session['user_id']
+                result = dict(cur.execute('''select hash from users where id = ?;''', 
+                                [session['user_id']]).fetchall()[0])
+                                            
+                # check password
+                # to-do: actually secure hash
+                if result['hash']!=hash(request.form.get("current")):
+                    return redirect('/account')
+                else:          
+                    cur.execute('''DELETE from tasks where user_id = ?;''', 
+                                [session['user_id']])
+                    cur.execute('''DELETE from users where id = ?;''', [session['user_id']])
+                    db.commit()
+                    del session['user_id']
                 
                 return redirect('/')
             else: 
         
                 # Ensure username was submitted
-                if not request.form.get("current"):
-                    # to-do: produce error message of some kind
-                    print('a')
-                    return redirect('/account')
-
-                # Ensure password was submitted
-                elif not request.form.get("new") or not request.form.get("new2"):
-                    print('b')
+                if not request.form.get("current") or not request.form.get("new") or not request.form.get("new2"):
                     # to-do: produce error message of some kind
                     return redirect('/account')
                     
                 elif request.form.get("new")!=request.form.get("new2"):
-                    print('c')
                     return redirect('/account')
 
                 db = get_db()
@@ -331,7 +334,7 @@ def account():
                 # check password
                 # to-do: actually secure hash
                 if result['hash']!=hash(request.form.get("current")):
-                    return redirect('/login')
+                    return redirect('/account')
                 else:            
                     cur.execute('''update users set hash=? where id=?;''', [hash(request.form.get("new")),session['user_id']])
                     db.commit()

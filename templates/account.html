@@ -1,27 +1,28 @@
 {% extends "layout.html" %}
 
 {% block title %}
-    Manage account
+    Manage Account
 {% endblock %}
 
 {% block main %}
-<h4>Change password</h4>
-    <form action="/account" method="post">
-        <div class="form-group">
-            <input autocomplete="off" autofocus class="form-control" name="current" placeholder="Current password" type="password">
-        </div>
-        <div class="form-group">
-            <input class="form-control" name="new" placeholder="New password" type="password">
-        </div>
-        <div class="form-group">
-            <input class="form-control" name="new2" placeholder="Re-type new password" type="password">
-        </div>
-        
-        <div>
-            <button class="btn btn-primary" type="submit">Update password</button>
-        </div>
-        <div>
-            <button class="btn btn-delete" name="delete" type="submit">Delete account</button>
-        </div>
-    </form>
+<h4>Manage Account</h4>
+
+<form action="/account" method="post">
+<div class="form-group">
+    <input autocomplete="off" autofocus class="form-control" name="current" placeholder="Current password" type="password" required>
+</div>
+<h5>Change password:</h5>
+<div class="form-group">
+    <input class="form-control" name="new" placeholder="New password" type="password">
+</div>
+<div class="form-group">
+    <input class="form-control" name="new2" placeholder="Re-type new password" type="password">
+</div>
+<div>
+    <button class="btn btn-primary" type="submit">Update password</button>
+</div>
+<div>
+    <button class="btn btn-delete" name="delete" type="submit"  onClick="return confirm('Are you sure you wish to delete your account and all data?');">Delete account</button>
+</div>
+</form>
 {% endblock %}

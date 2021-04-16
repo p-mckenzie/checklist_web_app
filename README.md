@@ -1,7 +1,7 @@
 # To-Do Checklist Web App
-**This project is under construction.**
 
-A python-based web application leveraging [Flask](https://flask.palletsprojects.com/en/1.1.x/).
+A python-based web application leveraging [Flask](https://flask.palletsprojects.com/en/1.1.x/). 
+Completed 4/16/2021.
 
 ### User-facing functionality
 * Allows users to register for an account (username and password)
@@ -17,10 +17,10 @@ A python-based web application leveraging [Flask](https://flask.palletsprojects.
 * Prompts users to register instead of logging in from /login
 * Allows users to change their password
 * Allows users to delete their account
-
-#### In-progress:
 * Produce errors when users enter insufficient data
 * Ask for confirmation when deleting tasks
 * Ask for confirmation when deleting account
 
+
 Project start: 2/18/2021
+Project completion: 4/16/2021
