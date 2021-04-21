@@ -48,13 +48,7 @@ def get_db():
         db = g._database = sqlite3.connect(DATABASE)
         db.row_factory = sqlite3.Row
     return db
-
-@app.teardown_appcontext
-def close_connection(exception):
-    db = getattr(g, '_database', None)
-    if db is not None:
-        db.close()
-        
+    
 DATABASE = 'database.db'
 if not os.path.isfile(DATABASE):
     # create database from schema if necessary
@@ -63,6 +57,12 @@ if not os.path.isfile(DATABASE):
 # reset sample data every time
 stage_sample_data()
 
+@app.teardown_appcontext
+def close_connection(exception):
+    db = getattr(g, '_database', None)
+    if db is not None:
+        db.close()
+        
 def hash(str):
     return ord(str[0])
 
@@ -210,31 +210,34 @@ def register():
     # User submitted form
     if request.method == "POST":
 
-        db = get_db()
-        cur = db.cursor()
-        
-        rows = cur.execute('''select username from users where username = ?;''', 
-                        [request.form.get("username")]).fetchall()
-        if len(rows)>0:
-            flash('ERROR: invalid username')
-            return redirect('/register')
-                    
-        # to-do: actually secure hash
-        cur.execute('''INSERT INTO users (username,hash) 
-           VALUES (?,?)''', [request.form.get("username"), hash(request.form.get("password"))])
-        
-        db.commit()
-        
-        rows = cur.execute('''select username,id from users where username = ?;''', 
-                        [request.form.get("username")]).fetchall()
-        # Remember which user has logged in
-        session["user_id"] = rows[0][1]
-        return redirect('/')
+        try:
+            db = get_db()
+            cur = db.cursor()
+            
+            rows = cur.execute('''select username from users where username = ?;''', 
+                            [request.form.get("username")]).fetchall()
+            if len(rows)>0:
+                flash('ERROR: invalid username')
+                return redirect('/register')
+                        
+            # to-do: actually secure hash
+            cur.execute('''INSERT INTO users (username,hash) 
+               VALUES (?,?)''', [request.form.get("username"), hash(request.form.get("password"))])
+            
+            db.commit()
+            
+            user_id = dict(cur.execute('''select id from users where username = ?;''', 
+                            [request.form.get("username")]).fetchall()[0])['id']
+            # Remember which user has logged in
+            session["user_id"] = user_id
+            return redirect('/')
+        except:
+            return redirect('/login')
 
     # User reached route via GET (as by clicking a link or via redirect)
     else:
         return render_template("register.html")
-        
+
 @app.route("/login", methods=["GET", "POST"])
 def login():
     '''Allows user to register for an account
@@ -331,7 +334,10 @@ def account():
 
     # User reached route via GET (as by clicking a link or via redirect)
     else:
-        return render_template("account.html")
+        if 'user_id' in session:
+            return render_template('account.html')
+        else:
+            return redirect('/')
         
 @app.route("/logout", methods=['GET'])
 def logout():
